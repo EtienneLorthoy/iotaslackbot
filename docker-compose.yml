@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  iota.slackbot:
+    image: iota.slackbot
+    build:
+      context: ./IOTA.Slackbot
+      dockerfile: Dockerfile
