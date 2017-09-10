@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,8 @@ namespace IOTA.Slackbot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.Configure<IotaBotSettings>(Configuration.GetSection("IotaBotSettings"));
 
             services.AddTransient<ISlackApiClient, SlackApiClient>();
         }

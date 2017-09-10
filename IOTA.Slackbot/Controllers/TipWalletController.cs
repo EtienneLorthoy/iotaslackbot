@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IOTA.Slackbot.Slack;
+using Microsoft.Extensions.Options;
 
 namespace IOTA.Slackbot.Controllers
 {
@@ -11,10 +12,14 @@ namespace IOTA.Slackbot.Controllers
     public class TipWalletController : Controller
     {
         private readonly ISlackApiClient _slackApiClient;
+        private readonly IOptions<IotaBotSettings> _iotaBotSettings;
 
-        public TipWalletController(ISlackApiClient slackApiClient)
+        public TipWalletController(
+            ISlackApiClient slackApiClient,
+            IOptions<IotaBotSettings> iotaBotSettings)
         {
             this._slackApiClient = slackApiClient;
+            this._iotaBotSettings = iotaBotSettings;
         }
 
         [HttpGet]
@@ -29,11 +34,12 @@ namespace IOTA.Slackbot.Controllers
         public async Task<IActionResult> Desposite([FromBody]SlackCommandParam commandParam)
         {
             // check token
-            if (commandParam.token != "TODO")
+            if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
             {
                return this.BadRequest("invalid slack token");
             }
 
+            // send iota adress
             await this._slackApiClient.SendMessage(commandParam.response_url, "test 11");
 
             return this.Ok();
