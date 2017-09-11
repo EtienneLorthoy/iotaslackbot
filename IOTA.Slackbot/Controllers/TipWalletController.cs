@@ -36,7 +36,12 @@ namespace IOTA.Slackbot.Controllers
             // check token
             if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
             {
-               return this.BadRequest("invalid slack token");
+                return this.BadRequest("invalid slack token : " + this._iotaBotSettings.Value.SlackBotToken);
+            }
+
+            if (string.IsNullOrEmpty(commandParam.response_url))
+            {
+                return this.BadRequest("no response url");
             }
 
             // send iota adress
