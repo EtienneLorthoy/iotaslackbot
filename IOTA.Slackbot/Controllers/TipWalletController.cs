@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IOTA.Slackbot.Slack;
 using Microsoft.Extensions.Options;
+using IOTA.Slackbot.Engine;
 
 namespace IOTA.Slackbot.Controllers
 {
@@ -13,53 +14,79 @@ namespace IOTA.Slackbot.Controllers
     {
         private readonly ISlackApiClient _slackApiClient;
         private readonly IOptions<IotaBotSettings> _iotaBotSettings;
+        private readonly ITransactionManager _transactionManager;
 
         public TipWalletController(
             ISlackApiClient slackApiClient,
-            IOptions<IotaBotSettings> iotaBotSettings)
+            IOptions<IotaBotSettings> iotaBotSettings,
+            ITransactionManager transactionManager)
         {
             this._slackApiClient = slackApiClient;
             this._iotaBotSettings = iotaBotSettings;
+            this._transactionManager = transactionManager;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("info")]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Info([FromForm]SlackCommandParam commandParam)
         {
-            return new string[] { "value1", "value2" };
+            if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
+            {
+                return this.BadRequest("invalid slack token");
+            }
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, "You have 100 iotas in your tip wallet.", false);
+            return this.Ok();
         }
 
         [HttpPost]
         [Route("deposite")]
-        public async Task<IActionResult> Desposite([FromBody]SlackCommandParam commandParam)
+        public async Task<IActionResult> Desposite([FromForm]SlackCommandParam commandParam)
         {
-            // check token
             if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
             {
-                return this.BadRequest("invalid slack token : " + this._iotaBotSettings.Value.SlackBotToken);
+                return this.BadRequest("invalid slack token");
             }
 
-            if (string.IsNullOrEmpty(commandParam.response_url))
-            {
-                return this.BadRequest("no response url");
-            }
-
-            // send iota adress
-            await this._slackApiClient.SendMessage(commandParam.response_url, "test 11");
-
+            // send iota address
+            await this._slackApiClient.SendMessage(commandParam.response_url, "Please send your iota to this address : 1234456789", false);
             return this.Ok();
         }
 
         [HttpPost]
         [Route("withdraw")]
-        public void Withdraw([FromBody]string value)
+        public async Task<IActionResult> Withdraw([FromForm]SlackCommandParam commandParam)
         {
+            if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
+            {
+                return this.BadRequest("invalid slack token");
+            }
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, "We will send your 100 iotas to the address 123456789 shortly.", false);
+            return this.Ok();
         }
 
         [HttpPost]
         [Route("sendtip")]
-        public void Sendtip([FromBody]string value)
+        public async Task<IActionResult> Sendtip([FromForm]SlackCommandParam commandParam)
         {
+            if (commandParam.token != this._iotaBotSettings.Value.SlackBotToken)
+            {
+                return this.BadRequest("invalid slack token");
+            }
+
+            var toUserId = "todo";
+            var toUserName = "todo";
+
+            var message = this._transactionManager.SendTip(
+                commandParam.user_id,
+                commandParam.user_name,
+                toUserId,
+                toUserName,
+                100);
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, message.Text, message.IsPublic);
+            return this.Ok();
         }
     }
 }

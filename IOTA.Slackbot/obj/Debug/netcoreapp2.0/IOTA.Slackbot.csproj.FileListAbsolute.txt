@@ -8,3 +8,4 @@ C:\dev\iotaslackbot\IOTA.Slackbot\bin\Debug\netcoreapp2.0\IOTA.Slackbot.dll
 C:\dev\iotaslackbot\IOTA.Slackbot\bin\Debug\netcoreapp2.0\IOTA.Slackbot.pdb
 C:\dev\iotaslackbot\IOTA.Slackbot\obj\Debug\netcoreapp2.0\IOTA.Slackbot.dll
 C:\dev\iotaslackbot\IOTA.Slackbot\obj\Debug\netcoreapp2.0\IOTA.Slackbot.pdb
+C:\dev\iotaslackbot\IOTA.Slackbot\obj\Debug\netcoreapp2.0\IOTA.Slackbot.csprojResolveAssemblyReference.cache

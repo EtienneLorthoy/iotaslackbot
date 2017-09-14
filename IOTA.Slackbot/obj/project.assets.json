@@ -42,6 +42,15 @@
           }
         }
       },
+      "LiteDB/3.1.4": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.3/LiteDB.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/LiteDB.dll": {}
+        }
+      },
       "Microsoft.ApplicationInsights/2.4.0": {
         "type": "package",
         "dependencies": {
@@ -4746,6 +4755,21 @@
         "runtimes/win-arm/native/libuv.dll",
         "runtimes/win-x64/native/libuv.dll",
         "runtimes/win-x86/native/libuv.dll"
+      ]
+    },
+    "LiteDB/3.1.4": {
+      "sha512": "Z8+ZCkOZ5lhRWPlQ02yneCbrARyiY+Tex/AJ/LVaJAGUKgc6lg2MM18c6xImoq5xs4TLUojUVEPzEyiO1uoQtA==",
+      "type": "package",
+      "path": "litedb/3.1.4",
+      "files": [
+        "lib/net35/LiteDB.dll",
+        "lib/net35/LiteDB.xml",
+        "lib/net462/LiteDB.dll",
+        "lib/net462/LiteDB.xml",
+        "lib/netstandard1.3/LiteDB.dll",
+        "lib/netstandard1.3/LiteDB.xml",
+        "litedb.3.1.4.nupkg.sha512",
+        "litedb.nuspec"
       ]
     },
     "Microsoft.ApplicationInsights/2.4.0": {
@@ -12511,6 +12535,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
+      "LiteDB >= 3.1.4",
       "Microsoft.AspNetCore.All >= 2.0.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Newtonsoft.Json >= 10.0.3"
@@ -12522,6 +12547,9 @@
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
       "projectUniqueName": "C:\\dev\\iotaslackbot\\IOTA.Slackbot\\IOTA.Slackbot.csproj",
       "projectName": "IOTA.Slackbot",
@@ -12533,12 +12561,14 @@
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\ofouc\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ofouc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -12555,6 +12585,10 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
+          "LiteDB": {
+            "target": "Package",
+            "version": "3.1.4"
+          },
           "Microsoft.NETCore.App": {
             "target": "Package",
             "version": "2.0.0",
