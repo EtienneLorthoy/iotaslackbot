@@ -8,7 +8,7 @@ namespace IOTA.Slackbot.Wallet
 {
     public interface IWalletRepository
     {
-        void CreateWallet(string userId, string userName);
+        Wallet CreateWallet(string userId, string userName);
         Wallet GetWallet(string userId);
         decimal AddIotas(string userId, decimal iotas);
         decimal RemoveIotas(string userId, decimal iotas);
@@ -20,7 +20,7 @@ namespace IOTA.Slackbot.Wallet
         private static string WalletCollectionPath = @"data/wallets.db";
         private static string WalletCollectionName = "wallets";
 
-        public void CreateWallet(string userId, string userName)
+        public Wallet CreateWallet(string userId, string userName)
         {
             using (var db = new LiteDatabase(WalletCollectionPath))
             {
@@ -33,12 +33,17 @@ namespace IOTA.Slackbot.Wallet
                     throw new InvalidOperationException("Wallet already exists");
                 }
 
-                col.Insert(new Wallet
-                    {
-                        SlackId = userId,
-                        SlackUsername = userName,
-                        Balance = 0
-                    });
+                var newWallet = new Wallet
+                {
+                    SlackId = userId,
+                    SlackUsername = userName,
+                    Balance = 0
+                };
+
+                col.EnsureIndex(x => x.SlackId, true);
+                col.Insert(newWallet);
+
+                return newWallet;
             }
         }
 
@@ -67,6 +72,7 @@ namespace IOTA.Slackbot.Wallet
 
                 wallet.Balance += iotas;
 
+                col.EnsureIndex(x => x.SlackId, true);
                 col.Update(wallet);
 
                 return wallet.Balance;
@@ -93,6 +99,7 @@ namespace IOTA.Slackbot.Wallet
 
                 wallet.Balance -= iotas;
 
+                col.EnsureIndex(x => x.SlackId, true);
                 col.Update(wallet);
 
                 return wallet.Balance;
@@ -120,6 +127,8 @@ namespace IOTA.Slackbot.Wallet
 
                 fromWallet.Balance -= iotas;
                 toWallet.Balance += iotas;
+
+                col.EnsureIndex(x => x.SlackId, true);
                 col.Update(new List<Wallet> { fromWallet, toWallet });
             }
         }

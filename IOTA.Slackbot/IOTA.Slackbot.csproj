@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Folder Include="Iota\" />
+    <Folder Include="data\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

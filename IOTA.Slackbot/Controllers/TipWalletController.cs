@@ -35,7 +35,11 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
-            await this._slackApiClient.SendMessage(commandParam.response_url, "You have 100 iotas in your tip wallet.", false);
+            var message = this._transactionManager.GetWalletInfo(
+                commandParam.user_id,
+                commandParam.user_name);
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, message.Text, message.IsPublic);
             return this.Ok();
         }
 

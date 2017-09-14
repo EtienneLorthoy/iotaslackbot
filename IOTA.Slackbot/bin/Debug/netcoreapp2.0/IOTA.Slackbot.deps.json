@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "e40e6cfb34932cef626234a3a144ffa14a003a3d"
+    "signature": "f6af0f21f5e12c2ea655469326145c773bbb73d6"
   },
   "compilationOptions": {
     "defines": [
@@ -23,6 +23,7 @@
     ".NETCoreApp,Version=v2.0": {
       "IOTA.Slackbot/1.0.0": {
         "dependencies": {
+          "LiteDB": "3.1.4",
           "Microsoft.AspNetCore.All": "2.0.0",
           "Microsoft.NETCore.App": "2.0.0",
           "Newtonsoft.Json": "10.0.3"
@@ -71,6 +72,14 @@
             "rid": "win-x86",
             "assetType": "native"
           }
+        }
+      },
+      "LiteDB/3.1.4": {
+        "runtime": {
+          "lib/netstandard1.3/LiteDB.dll": {}
+        },
+        "compile": {
+          "lib/netstandard1.3/LiteDB.dll": {}
         }
       },
       "Microsoft.ApplicationInsights/2.4.0": {
@@ -3965,6 +3974,13 @@
       "sha512": "sha512-GsCf4q+eyaI49rCPlgYxdxa1SQCysXFFdSJWdstrwxytg4+VPYLYrXD4AT2rjHVJ+UF7SSWX9CapWEYaU4ejVQ==",
       "path": "libuv/1.10.0",
       "hashPath": "libuv.1.10.0.nupkg.sha512"
+    },
+    "LiteDB/3.1.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Z8+ZCkOZ5lhRWPlQ02yneCbrARyiY+Tex/AJ/LVaJAGUKgc6lg2MM18c6xImoq5xs4TLUojUVEPzEyiO1uoQtA==",
+      "path": "litedb/3.1.4",
+      "hashPath": "litedb.3.1.4.nupkg.sha512"
     },
     "Microsoft.ApplicationInsights/2.4.0": {
       "type": "package",

@@ -7,6 +7,8 @@ namespace IOTA.Slackbot.Wallet
 {
     public class Wallet
     {
+        public Guid Id { get; set; }
+
         public string SlackId { get; set; }
 
         public string SlackUsername { get; set; }
