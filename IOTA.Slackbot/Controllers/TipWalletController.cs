@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using IOTA.Slackbot.Slack;
@@ -79,8 +80,10 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
-            var toUserId = "todo";
-            var toUserName = "todo";
+            var matches = Regex.Matches(commandParam.text, @"(\w+)");
+
+            var toUserId = matches[0].Value;
+            var toUserName = matches[1].Value;
 
             var message = this._transactionManager.SendTip(
                 commandParam.user_id,
