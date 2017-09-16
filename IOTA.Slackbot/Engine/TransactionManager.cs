@@ -8,9 +8,9 @@ namespace IOTA.Slackbot.Engine
 {
     public interface ITransactionManager
     {
-        void TmpDeposite(string userId, string userName, decimal iotas);
-        ResponseMessage GetWalletInfo(string userId, string userName);
-        ResponseMessage SendTip(string fromUserId, string fromUserName, string toUserId, string toUserName, decimal iotas);
+        void TmpDeposite(string userId, decimal iotas);
+        ResponseMessage GetWalletInfo(string userId);
+        ResponseMessage SendTip(string fromUserId, string toUserId, decimal iotas);
     }
 
     public class TransactionManager : ITransactionManager
@@ -22,31 +22,31 @@ namespace IOTA.Slackbot.Engine
             this._walletRepository = walletRepository;
         }
 
-        public void TmpDeposite(string userId, string userName, decimal iotas)
+        public void TmpDeposite(string userId, decimal iotas)
         {
             var wallet = this._walletRepository.GetWallet(userId);
 
             if (wallet == null)
             {
-                wallet = this._walletRepository.CreateWallet(userId, userName);
+                wallet = this._walletRepository.CreateWallet(userId);
             }
 
             this._walletRepository.AddIotas(userId, iotas);
         }
 
-        public ResponseMessage GetWalletInfo(string userId, string userName)
+        public ResponseMessage GetWalletInfo(string userId)
         {
             var wallet = this._walletRepository.GetWallet(userId);
 
             if (wallet == null)
             {
-                wallet = this._walletRepository.CreateWallet(userId, userName);
+                wallet = this._walletRepository.CreateWallet(userId);
             }
 
             return new ResponseMessage(string.Format("You have {0} iotas in your tip wallet. 0 withdraw pending. 0 deposite pending.", wallet.Balance));
         }
 
-        public ResponseMessage SendTip(string fromUserId, string fromUserName, string toUserId, string toUserName, decimal iotas)
+        public ResponseMessage SendTip(string fromUserId, string toUserId, decimal iotas)
         {
             if(fromUserId == toUserId)
             {
@@ -56,7 +56,7 @@ namespace IOTA.Slackbot.Engine
             var wallet = this._walletRepository.GetWallet(fromUserId);
             if(wallet == null)
             {
-                wallet = this._walletRepository.CreateWallet(fromUserId, fromUserName);
+                wallet = this._walletRepository.CreateWallet(fromUserId);
             }
 
             if(wallet.Balance < iotas)
@@ -67,12 +67,12 @@ namespace IOTA.Slackbot.Engine
             var toWallet = this._walletRepository.GetWallet(toUserId);
             if (toWallet == null)
             {
-                toWallet = this._walletRepository.CreateWallet(toUserId, toUserName);
+                toWallet = this._walletRepository.CreateWallet(toUserId);
             }
 
             this._walletRepository.TransferIotas(fromUserId, toUserId, iotas);
 
-            return new ResponseMessage(string.Format("You send {0} iotas to {1}.", iotas, toUserName), true);
+            return new ResponseMessage(string.Format("You send {0} iotas to {1}.", iotas, toUserId), true);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace IOTA.Slackbot.Wallet
 {
     public interface IWalletRepository
     {
-        Wallet CreateWallet(string userId, string userName);
+        Wallet CreateWallet(string userId);
         Wallet GetWallet(string userId);
         decimal AddIotas(string userId, decimal iotas);
         decimal RemoveIotas(string userId, decimal iotas);
@@ -20,7 +20,7 @@ namespace IOTA.Slackbot.Wallet
         private static string WalletCollectionPath = @"data/wallets.db";
         private static string WalletCollectionName = "wallets";
 
-        public Wallet CreateWallet(string userId, string userName)
+        public Wallet CreateWallet(string userId)
         {
             using (var db = new LiteDatabase(WalletCollectionPath))
             {
@@ -36,7 +36,6 @@ namespace IOTA.Slackbot.Wallet
                 var newWallet = new Wallet
                 {
                     SlackId = userId,
-                    SlackUsername = userName,
                     Balance = 0
                 };
 
