@@ -11,20 +11,17 @@ namespace IOTA.Slackbot.Slack
 {
     public interface ISlackApiClient
     {
-        Task<SlackResponse> SendMessage(string url, string text);
+        Task<SlackResponse> SendMessage(string url, string text, bool isPublic);
     }
 
     public class SlackApiClient : ISlackApiClient
     {
-        public Task<SlackResponse> SendMessage(string url, string text)
+        public Task<SlackResponse> SendMessage(string url, string text, bool isPublic)
         {
             var httpClient = new HttpClient();
             return httpClient.PostJsonAsync<SlackResponse>(
                 url,
-                new SlackMessageParam
-                {
-                    text = text
-                });
+                new SlackMessageParam(text, isPublic));
         }
 
     }

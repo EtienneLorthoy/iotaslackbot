@@ -6,14 +6,14 @@ namespace IOTA.Slackbot.Slack
 {
     public class SlackMessageParam
     {
-        public SlackMessageParam()
+        public SlackMessageParam(string text, bool isPublic)
         {
-            // ephemeral => only for user
-            this.response_type = "ephemeral";
+            this.text = text;
+            this.response_type = isPublic ? "in_channel" : "ephemeral";
         }
 
-        public string text { get; set; }
+        public string text { get; }
 
-        public string response_type { get; set; }
+        public string response_type { get;  }
     }
 }
