@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using IOTA.Slackbot.Slack;
 using IOTA.Slackbot.Wallet;
 using IOTA.Slackbot.Engine;
+using IOTA.Slackbot.Iota;
 
 namespace IOTA.Slackbot
 {
@@ -34,6 +35,7 @@ namespace IOTA.Slackbot
             services.AddTransient<ISlackApiClient, SlackApiClient>();
             services.AddTransient<IWalletRepository, WalletRepository>();
             services.AddTransient<ITransactionManager, TransactionManager>();
+            services.AddTransient<IIotaManager, IotaManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
