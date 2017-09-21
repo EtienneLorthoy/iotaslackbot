@@ -14,5 +14,7 @@ namespace IOTA.Slackbot.Wallet
         public string SlackUsername { get; set; }
 
         public decimal Balance { get; set; }
+
+        public List<TransactionSummary> DepositTransactions { get; set; }
     }
 }

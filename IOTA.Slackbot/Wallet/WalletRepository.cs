@@ -15,121 +15,100 @@ namespace IOTA.Slackbot.Wallet
         void TransferIotas(string fromUserId, string toUserId, decimal iotas);
     }
 
-    public class WalletRepository : IWalletRepository
+    public class WalletRepository : IWalletRepository, IDisposable
     {
         private static string WalletCollectionPath = @"data/wallets.db";
         private static string WalletCollectionName = "wallets";
 
+        private readonly LiteDatabase _db;
+        private readonly LiteCollection<Wallet> _collection;
+
+        public WalletRepository()
+        {
+            this._db = new LiteDatabase(WalletCollectionPath);
+            this._collection = this._db.GetCollection<Wallet>(WalletCollectionName);
+        }
+
         public Wallet CreateWallet(string userId)
         {
-            using (var db = new LiteDatabase(WalletCollectionPath))
+            var wallet = this._collection.FindOne(w => w.SlackId == userId);
+
+            if (wallet != null)
             {
-                var col = db.GetCollection<Wallet>(WalletCollectionName);
-
-                var wallet = col.FindOne(w => w.SlackId == userId);
-
-                if (wallet != null)
-                {
-                    throw new InvalidOperationException("Wallet already exists");
-                }
-
-                var newWallet = new Wallet
-                {
-                    SlackId = userId,
-                    Balance = 0
-                };
-
-                col.EnsureIndex(x => x.SlackId, true);
-                col.Insert(newWallet);
-
-                return newWallet;
+                throw new InvalidOperationException("Wallet already exists");
             }
+
+            var newWallet = new Wallet
+            {
+                SlackId = userId,
+                Balance = 0
+            };
+
+            this._collection.EnsureIndex(x => x.SlackId, true);
+            this._collection.Insert(newWallet);
+
+            return newWallet;
         }
 
         public Wallet GetWallet(string userId)
         {
-            using (var db = new LiteDatabase(WalletCollectionPath))
-            {
-                var col = db.GetCollection<Wallet>(WalletCollectionName);
-
-                return col.FindOne(w => w.SlackId == userId);
-            }
+            return this.GetOrCreateWallet(userId);
         }
 
         public decimal AddIotas(string userId, decimal iotas)
         {
-            using (var db = new LiteDatabase(WalletCollectionPath))
-            {
-                var col = db.GetCollection<Wallet>(WalletCollectionName);
+            var wallet = this.GetOrCreateWallet(userId);
 
-                var wallet = col.FindOne(w => w.SlackId == userId);
+            wallet.Balance += iotas;
 
-                if(wallet == null)
-                {
-                    throw new InvalidOperationException("Wallet does not exist");
-                }
+            this._collection.EnsureIndex(x => x.SlackId, true);
+            this._collection.Update(wallet);
 
-                wallet.Balance += iotas;
-
-                col.EnsureIndex(x => x.SlackId, true);
-                col.Update(wallet);
-
-                return wallet.Balance;
-            }
+            return wallet.Balance;
         }
 
         public decimal RemoveIotas(string userId, decimal iotas)
         {
-            using (var db = new LiteDatabase(WalletCollectionPath))
+            var wallet = this.GetOrCreateWallet(userId);
+
+            if (wallet.Balance - iotas < 0)
             {
-                var col = db.GetCollection<Wallet>(WalletCollectionName);
-
-                var wallet = col.FindOne(w => w.SlackId == userId);
-
-                if (wallet == null)
-                {
-                    throw new InvalidOperationException("Wallet does not exist");
-                }
-
-                if(wallet.Balance - iotas < 0)
-                {
-                    throw new InvalidOperationException("Not sufficient funds");
-                }
-
-                wallet.Balance -= iotas;
-
-                col.EnsureIndex(x => x.SlackId, true);
-                col.Update(wallet);
-
-                return wallet.Balance;
+                throw new InvalidOperationException("Not sufficient funds");
             }
+
+            wallet.Balance -= iotas;
+
+            this._collection.EnsureIndex(x => x.SlackId, true);
+            this._collection.Update(wallet);
+
+            return wallet.Balance;
         }
 
         public void TransferIotas(string fromUserId, string toUserId, decimal iotas)
         {
-            using (var db = new LiteDatabase(WalletCollectionPath))
+            var fromWallet = this.GetOrCreateWallet(fromUserId);
+            var toWallet = this.GetOrCreateWallet(toUserId);
+
+            if (fromWallet.Balance - iotas < 0)
             {
-                var col = db.GetCollection<Wallet>(WalletCollectionName);
-
-                var fromWallet = col.FindOne(w => w.SlackId == fromUserId);
-                var toWallet = col.FindOne(w => w.SlackId == toUserId);
-
-                if (fromWallet == null || toWallet == null)
-                {
-                    throw new InvalidOperationException("Wallet does not exist");
-                }
-
-                if (fromWallet.Balance - iotas < 0)
-                {
-                    throw new InvalidOperationException("Not sufficient funds");
-                }
-
-                fromWallet.Balance -= iotas;
-                toWallet.Balance += iotas;
-
-                col.EnsureIndex(x => x.SlackId, true);
-                col.Update(new List<Wallet> { fromWallet, toWallet });
+                throw new InvalidOperationException("Not sufficient funds");
             }
+
+            fromWallet.Balance -= iotas;
+            toWallet.Balance += iotas;
+
+            this._collection.EnsureIndex(x => x.SlackId, true);
+            this._collection.Update(new List<Wallet> { fromWallet, toWallet });
+        }
+
+        public void Dispose()
+        {
+            this._db?.Dispose();
+        }
+
+        private Wallet GetOrCreateWallet(string userId)
+        {
+            return this._collection.FindOne(w =>(w.SlackId == userId)) ?? this.CreateWallet(userId);
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using IOTA.Slackbot.Slack;
 using Microsoft.Extensions.Options;
 using IOTA.Slackbot.Engine;
+using IOTA.Slackbot.Iota;
 
 namespace IOTA.Slackbot.Controllers
 {
@@ -16,15 +17,18 @@ namespace IOTA.Slackbot.Controllers
         private readonly ISlackApiClient _slackApiClient;
         private readonly IOptions<IotaBotSettings> _iotaBotSettings;
         private readonly ITransactionManager _transactionManager;
+        private readonly IIotaManager _iotaManager;
 
         public TipWalletController(
             ISlackApiClient slackApiClient,
             IOptions<IotaBotSettings> iotaBotSettings,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IIotaManager iotaManager)
         {
             this._slackApiClient = slackApiClient;
             this._iotaBotSettings = iotaBotSettings;
             this._transactionManager = transactionManager;
+            this._iotaManager = iotaManager;
         }
 
         [HttpPost]
@@ -51,10 +55,13 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
+            //var address = this._iotaManager.CreateAddress();
+
+            // Move this to job
             this._transactionManager.TmpDeposite(commandParam.SlackUserIdentity, 500);
 
             // send iota address
-            await this._slackApiClient.SendMessage(commandParam.response_url, "Please send your iota to this address : 1234456789", false);
+            await this._slackApiClient.SendMessage(commandParam.response_url, $"Please send your iota to this address : 1273487263827", false);
             return this.Ok();
         }
 

@@ -9,6 +9,7 @@ namespace IOTA.Slackbot.Engine
     public interface ITransactionManager
     {
         void TmpDeposite(string userId, decimal iotas);
+        void RegisterDepositAddress(string userId, string address);
         ResponseMessage GetWalletInfo(string userId);
         ResponseMessage SendTip(string fromUserId, string toUserId, decimal iotas);
     }
@@ -22,27 +23,19 @@ namespace IOTA.Slackbot.Engine
             this._walletRepository = walletRepository;
         }
 
+        public void RegisterDepositAddress(string userId, string address)
+        {
+            
+        }
+
         public void TmpDeposite(string userId, decimal iotas)
         {
-            var wallet = this._walletRepository.GetWallet(userId);
-
-            if (wallet == null)
-            {
-                wallet = this._walletRepository.CreateWallet(userId);
-            }
-
             this._walletRepository.AddIotas(userId, iotas);
         }
 
         public ResponseMessage GetWalletInfo(string userId)
         {
             var wallet = this._walletRepository.GetWallet(userId);
-
-            if (wallet == null)
-            {
-                wallet = this._walletRepository.CreateWallet(userId);
-            }
-
             return new ResponseMessage(string.Format("You have {0} iotas in your tip wallet. 0 withdraw pending. 0 deposite pending.", wallet.Balance));
         }
 
@@ -54,25 +47,16 @@ namespace IOTA.Slackbot.Engine
             }
 
             var wallet = this._walletRepository.GetWallet(fromUserId);
-            if(wallet == null)
-            {
-                wallet = this._walletRepository.CreateWallet(fromUserId);
-            }
 
             if(wallet.Balance < iotas)
             {
                 return new ResponseMessage("You don't have enough iotas in your wallet.");
             }
 
-            var toWallet = this._walletRepository.GetWallet(toUserId);
-            if (toWallet == null)
-            {
-                toWallet = this._walletRepository.CreateWallet(toUserId);
-            }
-
             this._walletRepository.TransferIotas(fromUserId, toUserId, iotas);
 
             return new ResponseMessage(string.Format("You send {0} iotas to {1}.", iotas, toUserId), true);
         }
+
     }
 }
