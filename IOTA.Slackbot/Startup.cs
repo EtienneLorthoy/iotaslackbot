@@ -13,6 +13,7 @@ using IOTA.Slackbot.Slack;
 using IOTA.Slackbot.Wallet;
 using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
+using FluentScheduler;
 
 namespace IOTA.Slackbot
 {
@@ -45,6 +46,8 @@ namespace IOTA.Slackbot
             services.AddTransient<IWalletRepository, WalletRepository>();
             services.AddTransient<ITransactionManager, TransactionManager>();
             services.AddTransient<IIotaManager, IotaManager>();
+
+            JobManager.Initialize(new JobRegistry());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +68,14 @@ namespace IOTA.Slackbot
             Configuration = builder.Build();
 
             app.UseMvc();
+        }
+    }
+
+    public class JobRegistry : Registry
+    {
+        public JobRegistry()
+        {
+            Schedule<CheckTransactionsJob>().ToRunNow().AndEvery(5).Minutes();
         }
     }
 }
