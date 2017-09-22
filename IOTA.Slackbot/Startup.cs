@@ -24,6 +24,7 @@ namespace IOTA.Slackbot
         }
 
         public IConfiguration Configuration { get; set; }
+        public IHostingEnvironment HostingEnvironment { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,7 +33,15 @@ namespace IOTA.Slackbot
 
             services.Configure<IotaBotSettings>(Configuration.GetSection("IotaBotSettings"));
 
-            services.AddTransient<ISlackApiClient, SlackApiClient>();
+            if (HostingEnvironment.IsDevelopment())
+            {
+                services.AddTransient<ISlackApiClient, FakeSlackApiClient>();
+            }
+            else
+            {
+                services.AddTransient<ISlackApiClient, SlackApiClient>();
+                
+            }
             services.AddTransient<IWalletRepository, WalletRepository>();
             services.AddTransient<ITransactionManager, TransactionManager>();
             services.AddTransient<IIotaManager, IotaManager>();
@@ -45,6 +54,8 @@ namespace IOTA.Slackbot
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            HostingEnvironment = env;
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
