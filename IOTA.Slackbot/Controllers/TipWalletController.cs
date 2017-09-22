@@ -42,6 +42,10 @@ namespace IOTA.Slackbot.Controllers
 
             var message = this._transactionManager.GetWalletInfo(commandParam.SlackUserIdentity);
 
+#if DEBUG
+            return this.Ok(message);
+#endif
+
             await this._slackApiClient.SendMessage(commandParam.response_url, message.Text, message.IsPublic);
             return this.Ok();
         }
@@ -60,8 +64,13 @@ namespace IOTA.Slackbot.Controllers
             // Move this to job
             this._transactionManager.TmpDeposite(commandParam.SlackUserIdentity, 500);
 
-            // send iota address
-            await this._slackApiClient.SendMessage(commandParam.response_url, $"Please send your iota to this address : 1273487263827", false);
+            var message = $"Please send your iota to this address : 1273487263827";
+
+#if DEBUG
+            return this.Ok(message);
+#endif
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, message, false);
             return this.Ok();
         }
 
@@ -74,7 +83,12 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
-            await this._slackApiClient.SendMessage(commandParam.response_url, "We will send your 100 iotas to the address 123456789 shortly.", false);
+            var message = "We will send your 100 iotas to the address 123456789 shortly.";
+#if DEBUG
+            return this.Ok(message);
+#endif
+
+            await this._slackApiClient.SendMessage(commandParam.response_url, message, false);
             return this.Ok();
         }
 
@@ -94,6 +108,10 @@ namespace IOTA.Slackbot.Controllers
                 commandParam.SlackUserIdentity,
                 toUserId,
                 10);
+
+#if DEBUG
+            return this.Ok(message);
+#endif
 
             await this._slackApiClient.SendMessage(commandParam.response_url, message.Text, message.IsPublic);
             return this.Ok();
