@@ -12,6 +12,7 @@ using IOTA.Slackbot.Wallet;
 using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
 using FluentScheduler;
+using IOTA.Slackbot.Engine.Jobs;
 using IOTA.Slackbot.Iota.Repositories;
 
 namespace IOTA.Slackbot
@@ -64,6 +65,10 @@ namespace IOTA.Slackbot
     {
         public JobRegistry()
         {
+            // Startup Jobs 
+            Schedule<ScheduleCheckTransactionStartupJob>().ToRunOnceIn(5).Seconds();
+
+            // Recurring Jobs
             Schedule<CheckTransactionsJob>().ToRunNow().AndEvery(5).Minutes();
         }
     }

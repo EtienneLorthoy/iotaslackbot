@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LiteDB;
 
 namespace IOTA.Slackbot.Iota.Repositories
@@ -11,6 +13,7 @@ namespace IOTA.Slackbot.Iota.Repositories
     public interface IUniqueIndexRepository : IDisposable
     {
         int GetOrSetNextUniqueIndex(string userName, string userId);
+        IEnumerable<int> GetUnusedUniqueIndexes();
     }
 
     internal class UniqueIndexRepository : IUniqueIndexRepository
@@ -56,11 +59,19 @@ namespace IOTA.Slackbot.Iota.Repositories
                 }
 
                 this._collection.EnsureIndex(x => x.UniqueIndex, true);
-                this._collection.Update(uniqueIndex)
+                this._collection.Update(uniqueIndex);
             }
             // If not null the user didn't used its uniqueId yet, simply resend it.
 
             return uniqueIndex.UniqueIndex;;
+        }
+
+        public IEnumerable<int> GetUnusedUniqueIndexes()
+        {
+            var result = this._collection.Find(u => u.Used)
+                             .Select(u => u.UniqueIndex);
+
+            return result;
         }
 
         public void Dispose()
