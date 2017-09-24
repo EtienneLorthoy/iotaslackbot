@@ -18,7 +18,7 @@ namespace IOTA.Slackbot.Iota.Repositories
 
     internal class UniqueIndexRepository : IUniqueIndexRepository
     {
-        private static string UniqueCollectionPath = @"data/uniqueindexes.db";
+        private static string UniqueCollectionPath = @"./data/uniqueindexes.db";
         private static string UniqueCollectionName = "uniqueindexes";
 
         private readonly LiteDatabase _db;
@@ -69,7 +69,8 @@ namespace IOTA.Slackbot.Iota.Repositories
         public IEnumerable<int> GetUnusedUniqueIndexes()
         {
             var result = this._collection.Find(u => u.Used)
-                             .Select(u => u.UniqueIndex);
+                             .Select(u => u.UniqueIndex)
+                             .ToList();
 
             return result;
         }

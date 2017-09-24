@@ -19,12 +19,13 @@ namespace IOTA.Slackbot.Engine.Jobs
         public void Execute()
         {
             var indexesToVerify = _uniqueIndexRepository.GetUnusedUniqueIndexes();
+            var delay = 0;
 
             foreach (var index in indexesToVerify)
             {
                 var address = _iotaManager.CreateAddress(index);
-
-                ///// todo verify transaction into this address and credit user.
+                
+                JobManager.AddJob(new CheckTransactionsJob(address), s => s.ToRunOnceIn(++delay).Seconds());
             }
         }
     }

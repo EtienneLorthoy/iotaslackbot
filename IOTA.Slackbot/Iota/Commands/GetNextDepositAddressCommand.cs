@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentScheduler;
+using IOTA.Slackbot.Engine.Jobs;
 using IOTA.Slackbot.Iota.Repositories;
 
 namespace IOTA.Slackbot.Iota.Commands
@@ -22,6 +24,8 @@ namespace IOTA.Slackbot.Iota.Commands
         {
             var nextIndex = this._uniqueIndexRepository.GetOrSetNextUniqueIndex(username, userId);
             var address = this._iotaManager.CreateAddress(nextIndex);
+
+            JobManager.AddJob(new CheckTransactionsJob(address), s => s.ToRunOnceIn(5).Minutes());
 
             return address;
         }

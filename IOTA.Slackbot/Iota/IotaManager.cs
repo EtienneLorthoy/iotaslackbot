@@ -15,7 +15,7 @@ namespace IOTA.Slackbot.Iota
         string CreateAddress(int uniqueIndex);
     }
 
-    internal class IotaManager : IIotaManager
+    public class IotaManager : IIotaManager
     {
         private readonly IOptions<IotaBotSettings> _iotaBotSettings;
 

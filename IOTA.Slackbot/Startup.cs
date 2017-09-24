@@ -11,8 +11,7 @@ using IOTA.Slackbot.Slack;
 using IOTA.Slackbot.Wallet;
 using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
-using FluentScheduler;
-using IOTA.Slackbot.Engine.Jobs;
+using IOTA.Slackbot.Iota.Commands;
 using IOTA.Slackbot.Iota.Repositories;
 
 namespace IOTA.Slackbot
@@ -33,13 +32,19 @@ namespace IOTA.Slackbot
 
             services.Configure<IotaBotSettings>(Configuration.GetSection("IotaBotSettings"));
 
-            services.AddTransient<ISlackApiClient, SlackApiClient>();
-            services.AddTransient<IWalletRepository, WalletRepository>();
-            services.AddTransient<ITransactionManager, TransactionManager>();
-            services.AddTransient<IIotaManager, IotaManager>();
-            services.AddTransient<IUniqueIndexRepository, UniqueIndexRepository>();
+            // Repositories
+            services.AddScoped<IWalletRepository>(x => new WalletRepository());
+            services.AddScoped<IUniqueIndexRepository>(x => new UniqueIndexRepository());
 
-            JobManager.Initialize(new JobRegistry());
+            // Services
+            services.AddScoped<ITransactionManager, TransactionManager>();
+            services.AddScoped<IIotaManager, IotaManager>();
+            services.AddTransient<ISlackApiClient, SlackApiClient>();
+
+            // Command
+            services.AddTransient<GetNextDepositAddressCommand>();
+            
+            Engine.Startup.Initialization(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,18 +63,6 @@ namespace IOTA.Slackbot
             Configuration = builder.Build();
 
             app.UseMvc();
-        }
-    }
-
-    public class JobRegistry : Registry
-    {
-        public JobRegistry()
-        {
-            // Startup Jobs 
-            Schedule<ScheduleCheckTransactionStartupJob>().ToRunOnceIn(5).Seconds();
-
-            // Recurring Jobs
-            Schedule<CheckTransactionsJob>().ToRunNow().AndEvery(5).Minutes();
         }
     }
 }

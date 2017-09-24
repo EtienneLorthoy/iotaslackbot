@@ -17,7 +17,7 @@ namespace IOTA.Slackbot.Wallet
 
     public class WalletRepository : IWalletRepository, IDisposable
     {
-        private static string WalletCollectionPath = @"data/wallets.db";
+        private static string WalletCollectionPath = @"./data/wallets.db";
         private static string WalletCollectionName = "wallets";
 
         private readonly LiteDatabase _db;
