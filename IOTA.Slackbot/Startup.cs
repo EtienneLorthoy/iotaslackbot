@@ -12,6 +12,7 @@ using IOTA.Slackbot.Wallet;
 using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
 using FluentScheduler;
+using IOTA.Slackbot.Iota.Repositories;
 
 namespace IOTA.Slackbot
 {
@@ -35,6 +36,7 @@ namespace IOTA.Slackbot
             services.AddTransient<IWalletRepository, WalletRepository>();
             services.AddTransient<ITransactionManager, TransactionManager>();
             services.AddTransient<IIotaManager, IotaManager>();
+            services.AddTransient<IUniqueIndexRepository, UniqueIndexRepository>();
 
             JobManager.Initialize(new JobRegistry());
         }

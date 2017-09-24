@@ -20,7 +20,7 @@ namespace IOTA.Slackbot.Tests
             {
                 IotaNodePort = 14265,
                 IotaNodeUrl = "node.iotawallet.info",
-                IotaWalletSeed = "IOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLA",
+                IotaWalletSeed = "IOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACKBOTIOTASLACK",
                 SlackBotToken = string.Empty
             });
 
@@ -30,9 +30,20 @@ namespace IOTA.Slackbot.Tests
         [TestMethod]
         public void CreateAddress_returnAddress()
         {
-            var address = _iotaManager.CreateAddress();
+            var address = _iotaManager.CreateAddress(0);
 
             Assert.IsNotNull(address);
+        }
+
+        [TestMethod]
+        public void CreateAddress_whenCalledTwice_returnDifferentAddresses()
+        {
+            var address = _iotaManager.CreateAddress(0);
+            var address2 = _iotaManager.CreateAddress(1);
+
+            Assert.IsNotNull(address);
+            Assert.IsNotNull(address2);
+            Assert.AreNotEqual(address, address2);
         }
     }
 }

@@ -12,10 +12,10 @@ namespace IOTA.Slackbot.Iota
 {
     public interface IIotaManager
     {
-        string CreateAddress();
+        string CreateAddress(int uniqueIndex);
     }
 
-    public class IotaManager : IIotaManager
+    internal class IotaManager : IIotaManager
     {
         private readonly IOptions<IotaBotSettings> _iotaBotSettings;
 
@@ -29,11 +29,11 @@ namespace IOTA.Slackbot.Iota
             return new IotaApi(_iotaBotSettings.Value.IotaNodeUrl, _iotaBotSettings.Value.IotaNodePort);
         }
 
-        public string CreateAddress()
+        public string CreateAddress(int uniqueIndex)
         {
             IotaApi iotaApi = BuildIotaApi();
 
-            var newAddress = iotaApi.GetNewAddress(_iotaBotSettings.Value.IotaWalletSeed, 0, false, 1, true);
+            var newAddress = iotaApi.GetNewAddress(_iotaBotSettings.Value.IotaWalletSeed, uniqueIndex, false, 1, false);
 
             return newAddress[0];
         }
