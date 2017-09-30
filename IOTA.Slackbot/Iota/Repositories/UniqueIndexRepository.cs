@@ -14,6 +14,7 @@ namespace IOTA.Slackbot.Iota.Repositories
     {
         int GetOrSetNextUniqueIndex(string userName, string userId);
         IEnumerable<int> GetUnusedUniqueIndexes();
+        bool UserHasAddressAssigned(string userName, string userId);
     }
 
     internal class UniqueIndexRepository : IUniqueIndexRepository
@@ -32,7 +33,7 @@ namespace IOTA.Slackbot.Iota.Repositories
 
         public int GetOrSetNextUniqueIndex(string userName, string userId)
         {
-            var uniqueIndex = this._collection.FindOne(u => u.UserId == userId && u.Username == userName);
+            var uniqueIndex = this._collection.FindOne(u =>!u.Used && u.UserId == userId && u.Username == userName);
 
             if (uniqueIndex == null)
             {
@@ -44,6 +45,8 @@ namespace IOTA.Slackbot.Iota.Repositories
                     uniqueIndex.Used = false;
                     uniqueIndex.UserId = userId;
                     uniqueIndex.Username = userName;
+
+                    this._collection.Update(uniqueIndex);
                 }
                 // if all of uniqueId aren't used yet, create a new one
                 else
@@ -56,10 +59,10 @@ namespace IOTA.Slackbot.Iota.Repositories
                         UserId = userId,
                         Username = userName
                     };
+                    this._collection.Insert(uniqueIndex);
                 }
 
                 this._collection.EnsureIndex(x => x.Id, true);
-                this._collection.Update(uniqueIndex);
             }
             // If not null the user didn't used its uniqueId yet, simply resend it.
 
@@ -69,10 +72,17 @@ namespace IOTA.Slackbot.Iota.Repositories
         public IEnumerable<int> GetUnusedUniqueIndexes()
         {
             var result = this._collection.Find(u => u.Used)
-                             .Select(u => u.Id)
-                             .ToList();
+                .Select(u => u.Id)
+                .ToList();
 
             return result;
+        }
+
+        public bool UserHasAddressAssigned(string userName, string userId)
+        {
+            var uniqueIndex = this._collection.Count(u => !u.Used && u.UserId == userId && u.Username == userName);
+
+            return uniqueIndex > 0;
         }
 
         public void Dispose()

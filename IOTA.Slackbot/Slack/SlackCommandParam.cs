@@ -22,12 +22,6 @@ namespace IOTA.Slackbot.Slack
 
         public string response_url { get; set; }
 
-        public virtual string SlackUserIdentity
-        {
-            get
-            {
-                return channel_id + "_" + user_id;
-            }
-        }
+        public virtual string SlackUserIdentity => channel_id + "_" + user_id;
     }
 }
