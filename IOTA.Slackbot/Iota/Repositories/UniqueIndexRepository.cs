@@ -51,25 +51,25 @@ namespace IOTA.Slackbot.Iota.Repositories
                     var nextUniqueIndex = this._collection.Count();
                     uniqueIndex = new UserUniqueIndex
                     {
-                        UniqueIndex = nextUniqueIndex,
+                        Id = nextUniqueIndex,
                         Used = false,
                         UserId = userId,
                         Username = userName
                     };
                 }
 
-                this._collection.EnsureIndex(x => x.UniqueIndex, true);
+                this._collection.EnsureIndex(x => x.Id, true);
                 this._collection.Update(uniqueIndex);
             }
             // If not null the user didn't used its uniqueId yet, simply resend it.
 
-            return uniqueIndex.UniqueIndex;;
+            return uniqueIndex.Id;;
         }
 
         public IEnumerable<int> GetUnusedUniqueIndexes()
         {
             var result = this._collection.Find(u => u.Used)
-                             .Select(u => u.UniqueIndex)
+                             .Select(u => u.Id)
                              .ToList();
 
             return result;
