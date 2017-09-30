@@ -45,5 +45,16 @@ namespace IOTA.Slackbot.Tests
             Assert.IsNotNull(address2);
             Assert.AreNotEqual(address, address2);
         }
+
+        [TestMethod]
+        public void CreateAddress_whenCalledTwiceWithSameIndex_returnSameAddresses()
+        {
+            var address = _iotaManager.CreateAddress(0);
+            var address2 = _iotaManager.CreateAddress(0);
+
+            Assert.IsNotNull(address);
+            Assert.IsNotNull(address2);
+            Assert.AreEqual(address, address2);
+        }
     }
 }
