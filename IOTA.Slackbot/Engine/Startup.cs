@@ -8,15 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IOTA.Slackbot.Engine
 {
-    internal static class Startup
-    {
-        internal static void Initialization(IServiceCollection serviceCollection)
-        {
-            JobManager.Initialize(new JobRegistry(serviceCollection));
-            JobManager.JobFactory = new UnityJobFactory(serviceCollection.BuildServiceProvider());
-        }
-    }
-
     public class JobRegistry : Registry
     {
         private readonly IServiceCollection _serviceCollection;

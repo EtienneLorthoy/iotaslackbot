@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentScheduler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,25 +27,32 @@ namespace IOTA.Slackbot
         public IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
 
             services.Configure<IotaBotSettings>(Configuration.GetSection("IotaBotSettings"));
 
             // Repositories
-            services.AddScoped<IWalletRepository>(x => new WalletRepository());
-            services.AddScoped<IUniqueIndexRepository>(x => new UniqueIndexRepository());
+            services.AddSingleton<IWalletRepository>(x => new WalletRepository());
+            services.AddSingleton<IUniqueIndexRepository>(x => new UniqueIndexRepository());
 
             // Services
             services.AddScoped<ITransactionManager, TransactionManager>();
             services.AddScoped<IIotaManager, IotaManager>();
             services.AddTransient<ISlackApiClient, SlackApiClient>();
 
-            // Command
+            // Commands
             services.AddTransient<GetNextDepositAddressCommand>();
-            
-            Engine.Startup.Initialization(services);
+
+            // Jobs
+            JobManager.Initialize(new JobRegistry(services));
+
+            // Resolution stuff
+            var serviceProvider = services.BuildServiceProvider();
+            JobManager.JobFactory = new UnityJobFactory(serviceProvider);
+
+            return serviceProvider;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
