@@ -20,9 +20,9 @@ namespace IOTA.Slackbot.Iota.Commands
             _iotaManager = iotaManager;
         }
 
-        public string Execute(string userId, string username)
+        public string Execute(string userId)
         {
-            var nextIndex = this._uniqueIndexRepository.GetOrSetNextUniqueIndex(username, userId);
+            var nextIndex = this._uniqueIndexRepository.GetOrSetNextUniqueIndex(userId);
             var address = this._iotaManager.CreateAddress(nextIndex);
 
             JobManager.AddJob(new CheckTransactionsJob(address), s => s.ToRunOnceIn(5).Minutes());

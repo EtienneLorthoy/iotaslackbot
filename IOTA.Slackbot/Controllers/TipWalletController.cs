@@ -10,6 +10,8 @@ using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
 using IOTA.Slackbot.Iota.Commands;
 using IOTA.Slackbot.Iota.Repositories;
+using FluentScheduler;
+using IOTA.Slackbot.Engine.Jobs;
 
 namespace IOTA.Slackbot.Controllers
 {
@@ -22,22 +24,17 @@ namespace IOTA.Slackbot.Controllers
         private readonly IIotaManager _iotaManager;
         private readonly IUniqueIndexRepository _addressIndexRepository;
 
-        // Commands
-        private readonly GetNextDepositAddressCommand _getNextDepositAddressCommand;
-
         public TipWalletController(
             ISlackApiClient slackApiClient,
             IOptions<IotaBotSettings> iotaBotSettings,
             ITransactionManager transactionManager,
             IIotaManager iotaManager,
-            GetNextDepositAddressCommand getNextDepositAddressCommand,
             IUniqueIndexRepository addressIndexRepository)
         {
             this._slackApiClient = slackApiClient;
             this._iotaBotSettings = iotaBotSettings;
             this._transactionManager = transactionManager;
             this._iotaManager = iotaManager;
-            this._getNextDepositAddressCommand = getNextDepositAddressCommand;
             this._addressIndexRepository = addressIndexRepository;
         }
 
@@ -52,7 +49,7 @@ namespace IOTA.Slackbot.Controllers
 
             var message = this._transactionManager.GetWalletInfo(commandParam.SlackUserIdentity);
 
-            var hasAddressAssigned = this._addressIndexRepository.UserHasAddressAssigned(commandParam.user_name, commandParam.user_id) ? 1 : 0;
+            var hasAddressAssigned = this._addressIndexRepository.UserHasAddressAssigned(commandParam.SlackUserIdentity) ? 1 : 0;
             message.Text += $" Bot is waiting deposit in {hasAddressAssigned} address";
 
 #if DEBUG
@@ -72,8 +69,10 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
-            var result = this._getNextDepositAddressCommand.Execute(commandParam.user_id, commandParam.user_name);
-            var message = $"Please send your iota to this address : {result}";
+            var createIotaAddressJob = new CreateIotaAddressJob(commandParam.SlackUserIdentity, commandParam.response_url);
+            JobManager.AddJob(createIotaAddressJob, s => s.ToRunNow());
+
+            var message = $"We are going to send you an address to do the deposite.";
 
 #if DEBUG
             return this.Ok(message);
@@ -111,7 +110,7 @@ namespace IOTA.Slackbot.Controllers
             }
 
             var matches = Regex.Matches(commandParam.text, @"(\w+)");
-            var toUserId = commandParam.channel_id + "_" + matches[0].Value;
+            var toUserId = commandParam.team_id + "_" + matches[0].Value;
 
             var message = this._transactionManager.SendTip(
                 commandParam.SlackUserIdentity,

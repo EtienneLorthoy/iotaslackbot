@@ -12,9 +12,9 @@ namespace IOTA.Slackbot.Iota.Repositories
     /// </summary>
     public interface IUniqueIndexRepository : IDisposable
     {
-        int GetOrSetNextUniqueIndex(string userName, string userId);
+        int GetOrSetNextUniqueIndex(string userId);
         IEnumerable<int> GetUnusedUniqueIndexes();
-        bool UserHasAddressAssigned(string userName, string userId);
+        bool UserHasAddressAssigned(string userId);
     }
 
     internal class UniqueIndexRepository : IUniqueIndexRepository
@@ -31,9 +31,9 @@ namespace IOTA.Slackbot.Iota.Repositories
             _collection = this._db.GetCollection<UserUniqueIndex>(UniqueCollectionName);
         }
 
-        public int GetOrSetNextUniqueIndex(string userName, string userId)
+        public int GetOrSetNextUniqueIndex(string userId)
         {
-            var uniqueIndex = this._collection.FindOne(u =>!u.Used && u.UserId == userId && u.Username == userName);
+            var uniqueIndex = this._collection.FindOne(u =>!u.Used && u.UserId == userId);
 
             if (uniqueIndex == null)
             {
@@ -44,7 +44,6 @@ namespace IOTA.Slackbot.Iota.Repositories
                 {
                     uniqueIndex.Used = false;
                     uniqueIndex.UserId = userId;
-                    uniqueIndex.Username = userName;
 
                     this._collection.Update(uniqueIndex);
                 }
@@ -56,8 +55,7 @@ namespace IOTA.Slackbot.Iota.Repositories
                     {
                         Id = nextUniqueIndex,
                         Used = false,
-                        UserId = userId,
-                        Username = userName
+                        UserId = userId
                     };
                     this._collection.Insert(uniqueIndex);
                 }
@@ -78,9 +76,9 @@ namespace IOTA.Slackbot.Iota.Repositories
             return result;
         }
 
-        public bool UserHasAddressAssigned(string userName, string userId)
+        public bool UserHasAddressAssigned(string userId)
         {
-            var uniqueIndex = this._collection.Count(u => !u.Used && u.UserId == userId && u.Username == userName);
+            var uniqueIndex = this._collection.Count(u => !u.Used && u.UserId == userId);
 
             return uniqueIndex > 0;
         }
