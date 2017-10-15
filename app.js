@@ -11,8 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
-  
-  var iotaConnect = iota({
+    var iotaConnect = iota({
     'host': 'http://node.iotawallet.info',
     'port': 14265
   });
