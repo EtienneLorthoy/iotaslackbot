@@ -25,7 +25,7 @@ namespace IOTA.Slackbot.Engine.Jobs
             {
                 var address = _iotaManager.CreateAddress(index);
                 
-                JobManager.AddJob(new CheckTransactionsJob(address), s => s.ToRunOnceIn(++delay).Seconds());
+                //JobManager.AddJob(new CheckTransactionsJob(address), s => s.ToRunOnceIn(++delay).Seconds());
             }
         }
     }

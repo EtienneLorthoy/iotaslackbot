@@ -23,19 +23,22 @@ namespace IOTA.Slackbot.Controllers
         private readonly ITransactionManager _transactionManager;
         private readonly IIotaManager _iotaManager;
         private readonly IUniqueIndexRepository _addressIndexRepository;
+        private readonly GetNextDepositAddressCommand _getNextDepositAddressCommand;
 
         public TipWalletController(
             ISlackApiClient slackApiClient,
             IOptions<IotaBotSettings> iotaBotSettings,
             ITransactionManager transactionManager,
             IIotaManager iotaManager,
-            IUniqueIndexRepository addressIndexRepository)
+            IUniqueIndexRepository addressIndexRepository,
+            GetNextDepositAddressCommand getNextDepositAddressCommand)
         {
             this._slackApiClient = slackApiClient;
             this._iotaBotSettings = iotaBotSettings;
             this._transactionManager = transactionManager;
             this._iotaManager = iotaManager;
             this._addressIndexRepository = addressIndexRepository;
+            _getNextDepositAddressCommand = getNextDepositAddressCommand;
         }
 
         [HttpPost]
@@ -69,7 +72,7 @@ namespace IOTA.Slackbot.Controllers
                 return this.BadRequest("invalid slack token");
             }
 
-            var createIotaAddressJob = new CreateIotaAddressJob(commandParam.SlackUserIdentity, commandParam.response_url);
+            var createIotaAddressJob = new CreateIotaAddressJob(commandParam.SlackUserIdentity, commandParam.response_url, this._slackApiClient, this._getNextDepositAddressCommand);
             JobManager.AddJob(createIotaAddressJob, s => s.ToRunNow());
 
             var message = $"We are going to send you an address to do the deposite.";

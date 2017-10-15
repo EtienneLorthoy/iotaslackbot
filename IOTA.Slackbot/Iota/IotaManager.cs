@@ -13,6 +13,7 @@ namespace IOTA.Slackbot.Iota
     public interface IIotaManager
     {
         string CreateAddress(int uniqueIndex);
+        Bundle[] GetAllTransfers();
     }
 
     public class IotaManager : IIotaManager
@@ -33,7 +34,7 @@ namespace IOTA.Slackbot.Iota
         {
             IotaApi iotaApi = BuildIotaApi();
 
-            var newAddress = iotaApi.GetNewAddress(_iotaBotSettings.Value.IotaWalletSeed, uniqueIndex, false, 1, false);
+            var newAddress = iotaApi.GetNewAddress(_iotaBotSettings.Value.IotaWalletSeed, -0, false, 1, false);
 
             return newAddress[0];
         }
@@ -53,12 +54,19 @@ namespace IOTA.Slackbot.Iota
             List<Transaction> ftr = iotaApi.FindTransactionObjects(new string[] { address });
         }
 
-        public void GetAllTransfers()
+        public Bundle[] GetAllTransfers()
         {
             IotaApi iotaApi = BuildIotaApi();
 
-            var bundles = iotaApi.GetTransfers(_iotaBotSettings.Value.IotaWalletSeed, 0, 0, false);
+            return iotaApi.GetTransfers(_iotaBotSettings.Value.IotaWalletSeed, 0, 0, false);
         }
+
+        //public Bundle[] Get()
+        //{
+        //    IotaApi iotaApi = BuildIotaApi();
+
+        //    return iotaApi.FindTransactionsByAddresses()(_iotaBotSettings.Value.IotaWalletSeed, 0, 0, false);
+        //}
 
         public bool SendIotas(string address)
         {

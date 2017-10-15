@@ -69,7 +69,14 @@ namespace IOTA.Slackbot.Iota.Repositories
 
         public IEnumerable<int> GetUnusedUniqueIndexes()
         {
-            var result = this._collection.Find(u => u.Used)
+            var document = this._collection.Find(u => u.Used);
+
+            if (document == null && document.GetEnumerator() == null)
+            {
+                return new List<int>();
+            }
+
+            var result = document
                 .Select(u => u.Id)
                 .ToList();
 

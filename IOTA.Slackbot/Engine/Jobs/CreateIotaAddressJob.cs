@@ -16,10 +16,14 @@ namespace IOTA.Slackbot.Engine.Jobs
         private readonly ISlackApiClient _slackApiClient;
         private readonly GetNextDepositAddressCommand _getNextDepositAddressCommand;
 
-        public CreateIotaAddressJob(string userId, string responseUrl)
+        public CreateIotaAddressJob(string userId, string responseUrl,
+            ISlackApiClient slackApiClient,
+            GetNextDepositAddressCommand getNextDepositAddressCommand)
         {
             this.UserId = userId;
             this.ResponseUrl = responseUrl;
+            _slackApiClient = slackApiClient;
+            _getNextDepositAddressCommand = getNextDepositAddressCommand;
         }
 
         public void Execute()
