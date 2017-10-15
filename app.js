@@ -1,5 +1,5 @@
 const express = require('express');
-const iota = require('iota.lib.js');
+const IOTA = require('iota.lib.js');
 const request = require('request');
 const bodyParser = require('body-parser');
 require('dotenv').config()
@@ -12,20 +12,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
   
-  var iotaConnect = iota({
+  var iotaConnect = new IOTA({
     'host': 'http://node.iotawallet.info',
     'port': 14265
   });
 
-  iota.api.getNodeInfo(function(error, success) {
-    if (error) {
-        console.error(error);
-    } else {
-        console.log(success);
-    }
-  })
+//   iotaConnect.api.getNodeInfo(function(error, success) {
+//     if (error) {
+//         console.error(error);
+//     } else {
+//         console.log(success);
+//     }
+//   })
 
-  res.send(iota.version);
+  res.send(iotaConnect.version);
 })
 
 app.post('/api/tipwallet/info', function (req, res) {
