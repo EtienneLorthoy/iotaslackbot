@@ -11,14 +11,21 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
-  res.send('Hello!');
   
   var iotaConnect = iota({
     'host': 'http://node.iotawallet.info',
     'port': 14265
   });
 
-  res.send(iotaConnect.api.getNodeInfo());
+  iota.api.getNodeInfo(function(error, success) {
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(success);
+    }
+  })
+
+  res.send(iota.version);
 })
 
 app.post('/api/tipwallet/info', function (req, res) {
