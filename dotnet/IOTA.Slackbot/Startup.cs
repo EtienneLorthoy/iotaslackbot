@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FluentScheduler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +13,8 @@ using IOTA.Slackbot.Engine;
 using IOTA.Slackbot.Iota;
 using IOTA.Slackbot.Iota.Commands;
 using IOTA.Slackbot.Iota.Repositories;
+using Hangfire;
+using Hangfire.MemoryStorage;
 
 namespace IOTA.Slackbot
 {
@@ -27,7 +28,7 @@ namespace IOTA.Slackbot
         public IConfiguration Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
 
@@ -45,14 +46,8 @@ namespace IOTA.Slackbot
             // Commands
             services.AddTransient<GetNextDepositAddressCommand>();
 
-            // Jobs
-            JobManager.Initialize(new JobRegistry(services));
-
-            // Resolution stuff
-            var serviceProvider = services.BuildServiceProvider();
-            JobManager.JobFactory = new UnityJobFactory(serviceProvider);
-
-            return serviceProvider;
+            services.AddHangfire(config =>
+                  config.UseMemoryStorage());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
