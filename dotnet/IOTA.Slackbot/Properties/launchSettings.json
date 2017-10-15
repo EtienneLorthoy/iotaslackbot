@@ -1,0 +1,30 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:62172/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchUrl": "api/values",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IOTA.Slackbot": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Repos\\iotaslackbot\\IOTA.Slackbot\\bin\\Debug\\netcoreapp2.0",
+      "launchBrowser": true,
+      "launchUrl": "api/ping",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "use64Bit": true,
+      "applicationUrl": "http://localhost:62173/"
+    }
+  }
+}
