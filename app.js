@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', function (req, res) {
-  res.send('Hello tipwallet!')
+  res.send('Hello!')
 })
 
 app.post('/api/tipwallet/info', function (req, res) {
