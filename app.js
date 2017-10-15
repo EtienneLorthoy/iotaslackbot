@@ -24,7 +24,7 @@ app.post('/api/tipwallet/deposite', function (req, res) {
     if (req.body.token === process.env.SLACK_VERIFICATION_TOKEN)  {
 
         request.post(
-            req.bodyresponse_url,
+            req.body.response_url,
             { json: { text: 'test deposite' } },
             function (error, response, body) {
                 if (!error && response.statusCode == 200) {
