@@ -1,4 +1,4 @@
-﻿using FluentScheduler;
+using FluentScheduler;
 using IOTA.Slackbot.Iota.Commands;
 using IOTA.Slackbot.Slack;
 using System;
