@@ -1,17 +1,34 @@
-const express = require('express')
+const express = require('express');
+const iota = require('iota.lib.js');
 const request = require('request');
 const bodyParser = require('body-parser');
+const Agenda = require('agenda');
+const iotaManager = require("./src/core/iota/iotaManager.js");
 require('dotenv').config()
 
 const app = express()
 const PORT = process.env.PORT || 3000;
 
+var MongoClient = require('mongodb').MongoClient;
+var mongoConnectionString = process.env.MONGO_CONNECTION_STRING;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/', function (req, res) {
-  res.send('Hello!')
-})
+app.get('/', iotaManager.getNodeInfo)
+
+MongoClient.connect(mongoConnectionString, function (err, db) {
+    console.log("Connected successfully to server");
+
+
+    db.close();
+});
+
+var agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
+
+agenda.on('ready', function () {
+    agenda.every('3 minutes', 'test job');
+    agenda.start();
+});
 
 app.post('/api/tipwallet/info', function (req, res) {
     res.send('tipwallet info!')
@@ -21,7 +38,7 @@ app.post('/api/tipwallet/deposite', function (req, res) {
 
     console.log(req.body);
 
-    if (req.body.token === process.env.SLACK_VERIFICATION_TOKEN)  {
+    if (req.body.token === process.env.SLACK_VERIFICATION_TOKEN) {
 
         request.post(
             req.body.response_url,
