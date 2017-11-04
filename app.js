@@ -18,13 +18,16 @@ app.get('/', iotaManager.getNodeInfo)
 
 app.post('/api/tipwallet/info', function (req, res) {
     
+    console.error("starting info");
+
     MongoClient.connect(mongoConnectionString, function (err, db) {
         console.log("Connected successfully to server");
     
-    
+        console.error("connected to db"); 
         db.close();
     });
     
+    console.error("starting agenda"); 
     var agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
     
     agenda.on('ready', function () {
