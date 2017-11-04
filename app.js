@@ -16,21 +16,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', iotaManager.getNodeInfo)
 
-MongoClient.connect(mongoConnectionString, function (err, db) {
-    console.log("Connected successfully to server");
-
-
-    db.close();
-});
-
-var agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
-
-agenda.on('ready', function () {
-    agenda.every('3 minutes', 'test job');
-    agenda.start();
-});
-
 app.post('/api/tipwallet/info', function (req, res) {
+    
+    MongoClient.connect(mongoConnectionString, function (err, db) {
+        console.log("Connected successfully to server");
+    
+    
+        db.close();
+    });
+    
+    var agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
+    
+    agenda.on('ready', function () {
+        agenda.every('3 minutes', 'test job');
+        agenda.start();
+    });
+
     res.send('tipwallet info!')
 })
 
