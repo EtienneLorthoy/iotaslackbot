@@ -3,7 +3,9 @@ const iota = require('iota.lib.js');
 const request = require('request');
 const bodyParser = require('body-parser');
 const Agenda = require('agenda');
+var Promise = require('promise');
 const iotaManager = require("./src/core/iota/iotaManager.js");
+// const { createUser } = require("./src/core/user/userRepository.js");
 require('dotenv').config()
 
 const app = express()
@@ -40,8 +42,21 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
     });
 });
 
-app.post('/api/tipwallet/info', function (req, res) {
-    res.send('tipwallet info!')
+app.post('/api/tipwallet/info', async function (req, res) {
+
+    var user = {
+        slackId: "test123",
+        seed: "seed123"
+    };
+
+    var response = await db.collection('users').insert(user);
+
+
+    // var user = createUser(db, );
+
+    console.log(response.ops[0]);
+
+    res.send('tipwallet info!');
 })
 
 app.post('/api/tipwallet/deposite', function (req, res) {

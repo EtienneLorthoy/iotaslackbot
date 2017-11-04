@@ -1,26 +1,27 @@
 const mongodb = require('mongodb')
 
-var createUser = function (db, user, callback) {
+exports.createUser = function (db, user) {
     var collection = db.collection('users');
-
-    collection.insert(
+    var createdUser;
+    var dd = await collection.insert(
         user
         , function (err, result) {
-            //   assert.equal(err, null);
-            //   assert.equal(3, result.result.n);
-            //   assert.equal(3, result.ops.length);
             console.log("Inserted 1 user");
-            callback(result);
+            console.log(result.ops[0]);
+            createdUser = result.ops[0];
         });
+
+    console.log(createdUser);
+    return createdUser;
 }
 
-var getUser = function (db, slackId, callback) {
+exports.getUser = function (db, slackId) {
     var collection = db.collection('users');
 
     collection.findOne(
         { slackId: slackId }
         , function (err, result) {
             console.log("Inserted 1 user");
-            callback(result);
+            return result;
         });
 }
