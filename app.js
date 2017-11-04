@@ -1,8 +1,9 @@
 const express = require('express');
-const IOTA = require('iota.lib.js');
+const iota = require('iota.lib.js');
 const request = require('request');
 const bodyParser = require('body-parser');
 const Agenda = require('agenda');
+const iotaManager = require("./src/core/iota/iotaManager.js");
 require('dotenv').config()
 
 const app = express()
@@ -13,23 +14,7 @@ var mongoConnectionString = process.env.MONGO_CONNECTION_STRING;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/', function (req, res) {
-
-    var iotaConnect = new IOTA({
-        'host': 'http://node.iotawallet.info',
-        'port': 14265
-    });
-
-    //   iotaConnect.api.getNodeInfo(function(error, success) {
-    //     if (error) {
-    //         console.error(error);
-    //     } else {
-    //         console.log(success);
-    //     }
-    //   })
-
-    res.send(iotaConnect.version);
-})
+app.get('/', iotaManager.getNodeInfo)
 
 MongoClient.connect(mongoConnectionString, function (err, db) {
     console.log("Connected successfully to server");
