@@ -90,7 +90,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
     console.log(req);
 
     if (req.body.token !== process.env.SLACK_VERIFICATION_TOKEN) {
-        res.send('');
+        res.status(500).send('invalid token');
         return;
     }
 
