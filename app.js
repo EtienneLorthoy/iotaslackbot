@@ -43,8 +43,9 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
 app.get('/', async function(req, res) {
     var t = await iotaManager.getNodeInfo();
+    var e = await iotaManager.generateNewSeed();
 
-    res.status(200).send(t);
+    res.status(200).send(e);
 });
 
 app.post('/api/tipwallet/info', async function (req, res) {
