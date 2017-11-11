@@ -14,7 +14,6 @@ exports.init = function (){
 exports.getNodeInfo = async function () {
   var api = promise.promisifyAll(iotaConnect.api, {suffix: "Async"});
   var t = await api.getNodeInfoAsync();
-
   return t;
 }
 
