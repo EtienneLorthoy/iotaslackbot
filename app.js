@@ -41,7 +41,7 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
     });
 });
 
-app.get('/', async function(req, res) {
+app.get('/', async function (req, res) {
     var t = await iotaManager.getNodeInfo();
 
     res.status(200).send(t);
@@ -98,8 +98,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
 
     var user = await userRepository.getUser(db, slackId);
 
-    if (user === null)
-    {
+    if (user === null) {
         var newSeed = await iotaManager.generateNewSeed();
 
         newUser = {
@@ -111,13 +110,43 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
 
         var slackResponse = await request.post(
             req.body.response_url,
-            { json: { 
-                text: `seed:${newSeed}`,
-                response_type: "ephemeral", // "in_channel" => visible to all
-            } }
+            {
+                json: {
+                    text: `seed:${newSeed}`,
+                    response_type: "ephemeral", // "in_channel" => visible to all
+                }
+            }
         );
-        
+
         res.send();
+    } else {
+
+        // ex : "<@123444|bob>"
+        var myRegexp = /<@([^\|]*)|([^>]*)>/g;
+        var match = myRegexp.exec(req.body.text);
+        console.log(match[1]);
+
+        var targetSlackId = `${req.body.team_id}_${rmatch[1]}`;
+
+        var targetUser = await userRepository.getUser(db, targetSlackId);
+
+        if (targetUser === null) {
+            var targetUserNewSeed = await iotaManager.generateNewSeed();
+
+            newTargetUser = {
+                slackId: targetSlackId,
+                seed: targetUserNewSeed
+            };
+
+            targetUser = await userRepository.createUser(db, newTargetUser);
+        }
+
+        // generate new address for target user
+
+        // check if user has enough fund
+
+        // create new iota transaction
+
     }
 
     var newSeed = iotaManager.generateNewSeed();
