@@ -86,7 +86,37 @@ app.post('/api/tipwallet/withdraw', function (req, res) {
     res.send('tipwallet withdraw!');
 })
 
-app.post('/api/tipwallet/sendtip', function (req, res) {
+app.post('/api/tipwallet/sendtip', async function (req, res) {
+    console.log(req);
+
+    if (req.body.token !== process.env.SLACK_VERIFICATION_TOKEN) {
+        res.send('');
+        return;
+    }
+
+    var slackId = `${req.body.team_id}_${req.body.user_id}`;
+
+    var user = await userRepository.getUser(db, slackId);
+
+    if (user === null)
+    {
+        var newSeed = await iotaManager.generateNewSeed();
+
+        newUser = {
+            slackId: slackId,
+            seed: newSeed
+        };
+
+        user = await userRepository.createUser(db, newUser);
+
+        var slackResponse = await request.post(
+            req.body.response_url,
+            { json: { text: `seed:${newSeed}` } }
+        );
+        
+        res.send();
+    }
+
     var newSeed = iotaManager.generateNewSeed();
     res.send(newSeed);
 })
