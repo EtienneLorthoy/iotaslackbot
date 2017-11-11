@@ -1,5 +1,4 @@
 const express = require('express');
-const iota = require('iota.lib.js');
 const request = require('request');
 const bodyParser = require('body-parser');
 const Agenda = require('agenda');
@@ -16,9 +15,9 @@ var agenda;
 var MongoClient = require('mongodb').MongoClient;
 var mongoConnectionString = process.env.MONGO_CONNECTION_STRING;
 
-app.use(bodyParser.urlencoded({ extended: false }));
+iotaManager.init();
 
-app.get('/', iotaManager.getNodeInfo)
+app.use(bodyParser.urlencoded({ extended: false }));
 
 MongoClient.connect(mongoConnectionString, function (err, database) {
     if (err) {
@@ -42,6 +41,12 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
     });
 });
 
+app.get('/', async function(req, res) {
+    var t = await iotaManager.getNodeInfo();
+    
+    res.status(200).send('Ok');
+});
+
 app.post('/api/tipwallet/info', async function (req, res) {
 
     var user = {
@@ -50,7 +55,6 @@ app.post('/api/tipwallet/info', async function (req, res) {
     };
 
     var response = await db.collection('users').insert(user);
-
 
     // var user = createUser(db, );
 
@@ -79,7 +83,7 @@ app.post('/api/tipwallet/deposite', function (req, res) {
         return;
     }
 
-    res.status(500).send('invalid token')
+    res.status(500).send('invalid token');
 })
 
 app.post('/api/tipwallet/withdraw', function (req, res) {
