@@ -99,13 +99,9 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
     var slackId = `${req.body.team_id}_${req.body.user_id}`;
     var user = await userRepository.getUser(db, slackId);
 
-<<<<<<< HEAD
-    if (user === null) {
-=======
     if (user === null)
     {
         console.log(`Unknow slackid:${slackId} create new user.`);
->>>>>>> master
         var newSeed = await iotaManager.generateNewSeed();
 
         newUser = {
@@ -125,15 +121,10 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
                 }
             }
         );
-<<<<<<< HEAD
-
-=======
         console.log(`New seed sent to the created user.`);
         
->>>>>>> master
         res.send();
     } else {
-
         // ex : "<@123444|bob>"
         var myRegexp = /<@([^\|]*)|([^>]*)>/g;
         var match = myRegexp.exec(req.body.text);
@@ -144,6 +135,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         var targetUser = await userRepository.getUser(db, targetSlackId);
 
         if (targetUser === null) {
+            console.log(`Target user ${user.slackId} doesn't exit.`);
             var targetUserNewSeed = await iotaManager.generateNewSeed();
 
             newTargetUser = {
@@ -152,6 +144,8 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
             };
 
             targetUser = await userRepository.createUser(db, newTargetUser);
+
+            console.log(`Target user ${user.slackId} create`);
         }
 
         // generate new address for target user
