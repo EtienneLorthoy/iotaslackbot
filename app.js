@@ -43,8 +43,8 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
 app.get('/', async function(req, res) {
     var t = await iotaManager.getNodeInfo();
-    
-    res.status(200).send('Ok');
+
+    res.status(200).send(t);
 });
 
 app.post('/api/tipwallet/info', async function (req, res) {
@@ -64,7 +64,6 @@ app.post('/api/tipwallet/info', async function (req, res) {
 })
 
 app.post('/api/tipwallet/deposite', function (req, res) {
-
     console.log(req.body);
 
     if (req.body.token === process.env.SLACK_VERIFICATION_TOKEN) {
@@ -87,10 +86,11 @@ app.post('/api/tipwallet/deposite', function (req, res) {
 })
 
 app.post('/api/tipwallet/withdraw', function (req, res) {
-    res.send('tipwallet withdraw!')
+    res.send('tipwallet withdraw!');
 })
 
 app.post('/api/tipwallet/sendtip', function (req, res) {
-    res.send('tipwallet sendtip!')
+    var newSeed = iotaManager.generateNewSeed();
+    res.send(newSeed);
 })
 
