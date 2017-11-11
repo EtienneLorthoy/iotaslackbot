@@ -1,27 +1,32 @@
 const mongodb = require('mongodb')
+var Promise = require('promise');
 
-exports.createUser = function (db, user) {
-    var collection = db.collection('users');
-    var createdUser;
-    var dd = await collection.insert(
-        user
-        , function (err, result) {
-            console.log("Inserted 1 user");
-            console.log(result.ops[0]);
-            createdUser = result.ops[0];
-        });
+var upsertUser = async function(db, user) {
+    var userIdDb = await getUser(db, user.SlackId);
 
-    console.log(createdUser);
-    return createdUser;
-}
+    if(userIdDb === null) {
+        userIdDb = await createUser(db, user);
+        console.log(userIdDb);
+    }
 
-exports.getUser = function (db, slackId) {
-    var collection = db.collection('users');
+    return userIdDb;
+};
 
-    collection.findOne(
-        { slackId: slackId }
-        , function (err, result) {
-            console.log("Inserted 1 user");
-            return result;
-        });
-}
+var createUser = async function (db, user) {  
+    var response = await db.collection('users').insert(user);
+
+    return response.ops[0];
+};
+
+var getUser = async function (db, slackId) {
+    var response = await db.collection('users').findOne(
+        { slackId: slackId });
+
+    return response;
+};
+
+module.exports = {
+    createUser: createUser,
+    getUser: getUser,
+    upsertUser: upsertUser
+  }
