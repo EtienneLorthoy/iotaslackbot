@@ -19,7 +19,7 @@ exports.getNodeInfo = async function () {
 
 exports.generateNewSeed = function () {
   // Change it with an impredictable parameters from user.
-  return generatePassword(80, false, /\d/);
+  return generatePassword(81, false, /[A-Z9]/);
 }
 
 exports.createAddress = async function (seed) {

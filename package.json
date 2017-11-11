@@ -5,7 +5,7 @@
   "main": "app.js",
   "private": true,
   "scripts": {
-    "start": "npm install",
+    "start": "npm install package.json",
     "dev": "node app.js supervisor"
   },
   "author": "",

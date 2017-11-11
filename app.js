@@ -43,8 +43,9 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
 app.get('/', async function (req, res) {
     var t = await iotaManager.getNodeInfo();
+    var e = await iotaManager.generateNewSeed();
 
-    res.status(200).send(t);
+    res.status(200).send(e);
 });
 
 app.post('/api/tipwallet/info', async function (req, res) {
@@ -93,12 +94,18 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         res.status(500).send('invalid token');
         return;
     }
+    console.log('Slack token is valid');
 
     var slackId = `${req.body.team_id}_${req.body.user_id}`;
-
     var user = await userRepository.getUser(db, slackId);
 
+<<<<<<< HEAD
     if (user === null) {
+=======
+    if (user === null)
+    {
+        console.log(`Unknow slackid:${slackId} create new user.`);
+>>>>>>> master
         var newSeed = await iotaManager.generateNewSeed();
 
         newUser = {
@@ -107,6 +114,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         };
 
         user = await userRepository.createUser(db, newUser);
+        console.log(`User ${user.slackId} created.`);
 
         var slackResponse = await request.post(
             req.body.response_url,
@@ -117,7 +125,12 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
                 }
             }
         );
+<<<<<<< HEAD
 
+=======
+        console.log(`New seed sent to the created user.`);
+        
+>>>>>>> master
         res.send();
     } else {
 
@@ -149,7 +162,8 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
 
     }
 
-    var newSeed = iotaManager.generateNewSeed();
-    res.send(newSeed);
+    
+    console.log(`Slackid:${slackId} existed.`);
+    res.status(200);
 })
 
