@@ -130,7 +130,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         var match = myRegexp.exec(req.body.text);
         console.log(match[1]);
 
-        var targetSlackId = `${req.body.team_id}_${rmatch[1]}`;
+        var targetSlackId = `${req.body.team_id}_${match[1]}`;
 
         var targetUser = await userRepository.getUser(db, targetSlackId);
 
