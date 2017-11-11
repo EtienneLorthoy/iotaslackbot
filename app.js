@@ -93,13 +93,14 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         res.status(500).send('invalid token');
         return;
     }
+    console.log('Slack token is valid');
 
     var slackId = `${req.body.team_id}_${req.body.user_id}`;
-
     var user = await userRepository.getUser(db, slackId);
 
     if (user === null)
     {
+        console.log(`Unknow slackid:${slackId} create new user.`);
         var newSeed = await iotaManager.generateNewSeed();
 
         newUser = {
@@ -108,6 +109,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
         };
 
         user = await userRepository.createUser(db, newUser);
+        console.log(`User ${user.slackId} created.`);
 
         var slackResponse = await request.post(
             req.body.response_url,
@@ -116,11 +118,13 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
                 response_type: "ephemeral", // "in_channel" => visible to all
             } }
         );
+        console.log(`New seed sent to the created user.`);
         
         res.send();
     }
 
-    var newSeed = iotaManager.generateNewSeed();
-    res.send(newSeed);
+    
+    console.log(`Slackid:${slackId} existed.`);
+    res.status(200);
 })
 
