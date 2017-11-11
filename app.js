@@ -5,6 +5,7 @@ const Agenda = require('agenda');
 var Promise = require('promise');
 const iotaManager = require("./src/core/iota/iotaManager.js");
 const userRepository = require("./src/core/user/userRepository.js");
+const createTransactionJob = require("./src/core/iota/createTransactionJob.js");
 require('dotenv').config()
 
 const app = express()
@@ -35,8 +36,19 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
     agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
 
+    agenda.define('createtransaction', function(job, done) {
+        createTransactionJob.execute(job.attrs.data.sourceSeed, job.attrs.data.targetSeed);
+        done();
+
+        // doSomelengthyTask(function(data) {
+        //   formatThatData(data);
+        //   sendThatData(data);
+        //   done();
+        // });
+      });
+
     agenda.on('ready', function () {
-        agenda.every('3 minutes', 'test job');
+        // agenda.every('3 minutes', 'test job');
         agenda.start();
     });
 });
@@ -148,15 +160,13 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
             console.log(`Target user ${user.slackId} create`);
         }
 
-        // generate new address for target user
-
-        // check if user has enough fund
-
-        // create new iota transaction
-
+        // run job
+        agenda.now('createtransaction', {
+            sourceSeed : user.seed,
+            targetSeed : targetUser.seed
+        });
     }
 
-    
     console.log(`Slackid:${slackId} existed.`);
     res.status(200);
 })
