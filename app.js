@@ -111,7 +111,10 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
 
         var slackResponse = await request.post(
             req.body.response_url,
-            { json: { text: `seed:${newSeed}` } }
+            { json: { 
+                text: `seed:${newSeed}`,
+                response_type: "ephemeral", // "in_channel" => visible to all
+            } }
         );
         
         res.send();
