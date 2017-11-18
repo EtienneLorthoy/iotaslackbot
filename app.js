@@ -36,7 +36,7 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
     agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
 
-    agenda.define('createtransaction', function(job, done) {
+    agenda.define('createtransaction', function (job, done) {
         createTransactionJob.execute(job.attrs.data.sourceSeed, job.attrs.data.targetSeed);
         done();
 
@@ -45,7 +45,7 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
         //   sendThatData(data);
         //   done();
         // });
-      });
+    });
 
     agenda.on('ready', function () {
         // agenda.every('3 minutes', 'test job');
@@ -112,8 +112,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
     var slackId = `${req.body.team_id}_${req.body.user_id}`;
     var user = await userRepository.getUser(db, slackId);
 
-    if (user === null)
-    {
+    if (user === null) {
         console.log(`Unknow slackid:${slackId} create new user.`);
         var newSeed = await iotaManager.generateNewSeed();
 
@@ -135,7 +134,7 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
             }
         );
         console.log(`New seed sent to the created user.`);
-        
+
         res.send();
     } else {
         // ex : "<@123444|bob>"
@@ -160,25 +159,15 @@ app.post('/api/tipwallet/sendtip', async function (req, res) {
 
             console.log(`Target user ${targetUser.slackId} create`);
         }
-
-<<<<<<< HEAD
-        // generate new address for target user
-
-        // check if user has enough fund
-
-        // create new iota transaction
-    }
-
-=======
         // run job
         agenda.now('createtransaction', {
-            sourceSeed : user.seed,
-            targetSeed : targetUser.seed
+            sourceSeed: user.seed,
+            targetSeed: targetUser.seed
         });
     }
 
     console.log(`Slackid:${slackId} existed.`);
->>>>>>> acff1d263f7aa0f8b4592b1e9379f14e1d6b2afb
+
     res.status(200);
 })
 
