@@ -1,9 +1,9 @@
 const promise = require("bluebird");
 const iota = require('iota.lib.js');
 const generatePassword = require('password-generator');
-var api = promise.promisifyAll(iotaConnect.api, {suffix: "Async"});
 
 var iotaConnect;
+var api;
 
 exports.init = function (){
   iotaConnect = new iota({
@@ -11,6 +11,7 @@ exports.init = function (){
     'port': 14265,
     'sandbox': 'true'
   });
+  api = promise.promisifyAll(iotaConnect.api, {suffix: "Async"});
 }
 
 exports.getNodeInfo = async function () {
