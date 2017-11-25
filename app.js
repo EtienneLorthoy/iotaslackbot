@@ -55,10 +55,10 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
 
 app.get('/', async function (req, res) {
     var t = await iotaManager.getNodeInfo();
+    console.log(t);
+    var bundle = await iotaManager.sendIotas('NKAFTGEHJSGURVSEAUYPEDNPULRGZBQDOPXKACXLEJQXQDYNMYBWULHCNEQAFZBAVJLQDBKDRHIEPMSSD', 'NKAFTGEHJSGURVSEAUYPEDNPULRGZBQDOPXKACXLEJQXQDYNMYBWULHCNEQAFZBAVJLQDBKDRHIEPMSSA', 0)
 
-    var bundle = await iotaManager.sendIotas(NKAFTGEHJSGURVSEAUYPEDNPULRGZBQDOPXKACXLEJQXQDYNMYBWULHCNEQAFZBAVJLQDBKDRHIEPMSSD, NKAFTGEHJSGURVSEAUYPEDNPULRGZBQDOPXKACXLEJQXQDYNMYBWULHCNEQAFZBAVJLQDBKDRHIEPMSSA, 0)
-
-    res.status(200).send(e);
+    res.status(200).send();
 });
 
 app.post('/api/tipwallet/info', async function (req, res) {

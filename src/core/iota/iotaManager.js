@@ -4,6 +4,7 @@ const generatePassword = require('password-generator');
 
 var iotaConnect;
 var api;
+var tools;
 
 exports.init = function (){
   iotaConnect = new iota({
@@ -12,6 +13,9 @@ exports.init = function (){
     'sandbox': 'true'
   });
   api = promise.promisifyAll(iotaConnect.api, {suffix: "Async"});
+  utils = iotaConnect.utils;
+
+  console.log("Iota manager ready");  
 }
 
 exports.getNodeInfo = async function () {
@@ -36,23 +40,33 @@ exports.findTransactions = function () {
   
 }
 
-exports.sendIotas = function (sourceSeed, targetSeed, amount) {
-  var sourceAddress = api.getNewAddress(sourceSeed);
-  var targetAddress = api.getNewAddress(targetSeed);
+exports.sendIotas = async function (sourceSeed, targetSeed, amount) {
+  // var sourceAddress = await api.getNewAddressAsync(sourceSeed);
+  var targetAddress = await api.getNewAddressAsync(targetSeed);
+  
+  // var transfertBundle = await api.prepareTransfersAsync(sourceSeed,
+  //   [{
+  //       'address': targetAddress,
+  //       'value': amount
+  //   }], {
+  //   'inputs': [
+  //       {
+  //           address: sourceAddress,
+  //           balance: 0,
+  //           keyIndex: 0,
+  //           security: 3
+  //       }
+  //   ]});
 
-  var transfertBundle = api.prepareTransfers(sourceSeed,
-    [{
-        'address': targetAddress,
-        'value': amount
-    }], {
-    'inputs': [
-        {
-            address: sourceAddress,
-            balance: 0,
-            keyIndex: 0,
-            security: 3
-        }
-    ]});
+  var messageTrytes = utils.toTrytes("IOTA Tip Bot");
 
-    console.log(`New bundle ready ${transfertBundle}`);
+  var transfer = [{
+      'address': targetAddress,
+      'value': amount,
+      'message': messageTrytes
+  }]
+
+  var resultTransfert = await api.sendTransferAsync(sourceSeed, 4, 18, transfer)
+
+  console.log(`New bundle ready ${resultTransfert}`);
 }
