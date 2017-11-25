@@ -6,6 +6,7 @@ var Promise = require('promise');
 const iotaManager = require("./src/core/iota/iotaManager.js");
 const userRepository = require("./src/core/user/userRepository.js");
 const createTransactionJob = require("./src/core/iota/createTransactionJob.js");
+const sendTipJob = require("./src/core/sendTipJob.js");
 require('dotenv').config()
 
 const app = express()
@@ -16,7 +17,7 @@ var agenda;
 var MongoClient = require('mongodb').MongoClient;
 var mongoConnectionString = process.env.MONGO_CONNECTION_STRING;
 
-iotaManager.init();
+// iotaManager.init();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -33,19 +34,24 @@ MongoClient.connect(mongoConnectionString, function (err, database) {
     app.listen(PORT, function () {
         console.log(`Server is running on port ${PORT}`)
     });
+    
+    Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
 
-    agenda = new Agenda({ db: { address: mongoConnectionString, collection: 'jobs' } });
-
-    agenda.define('createtransaction', function (job, done) {
-        createTransactionJob.execute(job.attrs.data.sourceSeed, job.attrs.data.targetSeed);
+    agenda.define('sendTip', async function (job, done) {
+        await sendTipJob.execute(job.attrs.data.slackCommand, db);
         done();
-
-        // doSomelengthyTask(function(data) {
-        //   formatThatData(data);
-        //   sendThatData(data);
-        //   done();
-        // });
     });
+
+    // agenda.define('createtransaction', function (job, done) {
+    //     createTransactionJob.execute(job.attrs.data.sourceSeed, job.attrs.data.targetSeed);
+    //     done();
+
+    //     // doSomelengthyTask(function(data) {
+    //     //   formatThatData(data);
+    //     //   sendThatData(data);
+    //     //   done();
+    //     // });
+    // });
 
     agenda.on('ready', function () {
         // agenda.every('3 minutes', 'test job');
@@ -101,72 +107,28 @@ app.post('/api/tipwallet/withdraw', function (req, res) {
 })
 
 app.post('/api/tipwallet/sendtip', async function (req, res) {
-    console.log(req);
+    // console.log(req);
 
     if (req.body.token !== process.env.SLACK_VERIFICATION_TOKEN) {
         res.status(500).send('invalid token');
         return;
     }
-    console.log('Slack token is valid');
 
-    var slackId = `${req.body.team_id}_${req.body.user_id}`;
-    var user = await userRepository.getUser(db, slackId);
+    console.log('Slack token is valid')
 
-    if (user === null) {
-        console.log(`Unknow slackid:${slackId} create new user.`);
-        var newSeed = await iotaManager.generateNewSeed();
-
-        newUser = {
-            slackId: slackId,
-            seed: newSeed
-        };
-
-        user = await userRepository.createUser(db, newUser);
-        console.log(`User ${user.slackId} created.`);
-
-        var slackResponse = await request.post(
-            req.body.response_url,
-            {
-                json: {
-                    text: `seed:${newSeed}`,
-                    response_type: "ephemeral", // "in_channel" => visible to all
-                }
+    request.post(
+        req.body.response_url,
+        { json: { text: 'Send tip command processing' } },
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body)
             }
-        );
-        console.log(`New seed sent to the created user.`);
-
-        res.send();
-    } else {
-        // ex : "<@123444|bob>"
-        var myRegexp = /<@([^\|]*)|([^>]*)>/g;
-        var match = myRegexp.exec(req.body.text);
-        console.log(match[1]);
-
-        var targetSlackId = `${req.body.team_id}_${match[1]}`;
-
-        var targetUser = await userRepository.getUser(db, targetSlackId);
-
-        if (targetUser === null) {
-            console.log(`Target user ${targetUser.slackId} doesn't exit.`);
-            var targetUserNewSeed = await iotaManager.generateNewSeed();
-
-            newTargetUser = {
-                slackId: targetSlackId,
-                seed: targetUserNewSeed
-            };
-
-            targetUser = await userRepository.createUser(db, newTargetUser);
-
-            console.log(`Target user ${targetUser.slackId} create`);
         }
-        // run job
-        agenda.now('createtransaction', {
-            sourceSeed: user.seed,
-            targetSeed: targetUser.seed
-        });
-    }
+    );
 
-    console.log(`Slackid:${slackId} existed.`);
+    agenda.now('sendTip', {
+        slackCommand: req.body
+    });
 
     res.status(200);
 })

@@ -66,7 +66,13 @@ exports.sendIotas = async function (sourceSeed, targetSeed, amount) {
       'message': messageTrytes
   }]
 
-  var resultTransfert = await api.sendTransferAsync(sourceSeed, 4, 18, transfer)
+  api.sendTransfer(sourceSeed, 4, 18, transfer, function(error, success) {
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(success);
+    }
+  });
 
   console.log(`New bundle ready ${resultTransfert}`);
 }
